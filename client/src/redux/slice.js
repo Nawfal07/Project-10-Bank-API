@@ -6,6 +6,7 @@ const initialState = {
   password: "",
   token: "",
   error: "",
+  user: null,
 };
 
 const BASE_URL = "http://localhost:3001/api/v1/user";
@@ -28,7 +29,47 @@ export const login = createAsyncThunk(
       },
     });
     const data = await response.json();
-    console.log("data", data);
+    return data;
+  }
+);
+
+export const getUserDetails = createAsyncThunk(
+  "api/userDetails",
+  async (arg, { getState }) => {
+    // Accessing the entire Redux state
+    const state = getState();
+
+    const response = await fetch(`${BASE_URL}/profile`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${state.authentication.token}`,
+      },
+    });
+    const data = await response.json();
+    return data;
+  }
+);
+
+export const editUserProfile = createAsyncThunk(
+  "api/editUserProfile",
+  async ({ firstName, lastName }, { getState }) => {
+    const state = getState();
+
+    const response = await fetch(`${BASE_URL}/profile`, {
+      method: "PUT",
+      body: JSON.stringify({
+        firstName,
+        lastName,
+      }),
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${state.authentication.token}`,
+      },
+    });
+    const data = await response.json();
     return data;
   }
 );
@@ -57,6 +98,28 @@ export const authenticationSlice = createSlice({
         state.token = action.payload?.body?.token || "";
       })
       .addCase(login.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(getUserDetails.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getUserDetails.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload.body;
+      })
+      .addCase(getUserDetails.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(editUserProfile.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(editUserProfile.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload.body;
+      })
+      .addCase(editUserProfile.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });

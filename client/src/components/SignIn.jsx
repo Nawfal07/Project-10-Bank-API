@@ -15,7 +15,7 @@ export default function SignIn() {
   useEffect(() => {
     console.log("token", token);
     if (token) {
-      navigate("/user");
+      navigate("/profile");
     }
   }, [navigate, token]);
 

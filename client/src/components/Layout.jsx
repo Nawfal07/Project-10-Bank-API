@@ -5,6 +5,9 @@ import { logout } from "../redux/slice";
 
 export default function Layout() {
   const token = useSelector((state) => state.authentication.token);
+  const currentUserFirstName = useSelector(
+    (state) => state.authentication.user.firstName
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -26,7 +29,7 @@ export default function Layout() {
         </Link>
         {!token ? (
           <div>
-            <Link className="main-nav-item" href="" to="sign-in">
+            <Link className="main-nav-item" href="" to="login">
               <i className="fa fa-user-circle"></i>
               Sign In
             </Link>
@@ -35,7 +38,7 @@ export default function Layout() {
           <>
             <div class="main-nav-item">
               <i class="fa fa-user-circle"></i>
-              Tony
+              {currentUserFirstName}
             </div>
             <div class="main-nav-item" onClick={handleLogout}>
               <i class="fa fa-sign-out"></i>
