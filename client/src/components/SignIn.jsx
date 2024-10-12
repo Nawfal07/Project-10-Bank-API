@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login, setPassword, setUsername } from "../redux/slice";
+import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
   const username = useSelector((state) => state.authentication.username);
   const password = useSelector((state) => state.authentication.password);
+  const token = useSelector((state) => state.authentication.token);
+
+  const navigate = useNavigate();
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log("token", token);
+    if (token) {
+      navigate("/user");
+    }
+  }, [navigate, token]);
 
   return (
     <main className="main bg-dark">

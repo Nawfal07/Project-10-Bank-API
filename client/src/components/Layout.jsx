@@ -1,7 +1,18 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { logout } from "../redux/slice";
 
 export default function Layout() {
+  const token = useSelector((state) => state.authentication.token);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+  };
+
   return (
     <>
       <nav className="main-nav">
@@ -13,12 +24,25 @@ export default function Layout() {
           />
           <h1 className="sr-only">Argent Bank</h1>
         </Link>
-        <div>
-          <Link className="main-nav-item" href="" to="sign-in">
-            <i className="fa fa-user-circle"></i>
-            Sign In
-          </Link>
-        </div>
+        {!token ? (
+          <div>
+            <Link className="main-nav-item" href="" to="sign-in">
+              <i className="fa fa-user-circle"></i>
+              Sign In
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div class="main-nav-item">
+              <i class="fa fa-user-circle"></i>
+              Tony
+            </div>
+            <div class="main-nav-item" onClick={handleLogout}>
+              <i class="fa fa-sign-out"></i>
+              Sign Out
+            </div>
+          </>
+        )}
       </nav>
       <Outlet />
       <footer className="footer">

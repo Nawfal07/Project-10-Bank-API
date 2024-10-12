@@ -5,26 +5,33 @@ const initialState = {
   username: "",
   password: "",
   token: "",
+  error: "",
 };
 
 const BASE_URL = "http://localhost:3001/api/v1/user";
-// Define an async thunk for making the API call
-export const login = createAsyncThunk("api/fetchData", async () => {
-  const response = await fetch(`${BASE_URL}/login`, {
-    method: "POST",
-    body: JSON.stringify({
-      email: "test@test",
-      password: "test",
-    }),
-    headers: {
-      accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  });
-  const data = await response.json();
-  console.log("data", data);
-  return data;
-});
+
+export const login = createAsyncThunk(
+  "api/fetchData",
+  async (arg, { getState }) => {
+    // Accessing the entire Redux state
+    const state = getState();
+
+    const response = await fetch(`${BASE_URL}/login`, {
+      method: "POST",
+      body: JSON.stringify({
+        email: state.authentication.username,
+        password: state.authentication.password,
+      }),
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    console.log("data", data);
+    return data;
+  }
+);
 
 export const authenticationSlice = createSlice({
   name: "authentication",
@@ -47,7 +54,7 @@ export const authenticationSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.token = action.payload.body.token;
+        state.token = action.payload?.body?.token || "";
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";
@@ -57,12 +64,6 @@ export const authenticationSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {
-  increment,
-  decrement,
-  incrementByAmount,
-  setUsername,
-  setPassword,
-} = authenticationSlice.actions;
+export const { setUsername, setPassword, logout } = authenticationSlice.actions;
 
 export default authenticationSlice.reducer;
